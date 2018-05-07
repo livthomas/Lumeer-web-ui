@@ -24,7 +24,7 @@ import {I18n} from '@ngx-translate/i18n-polyfill';
 import {Observable} from 'rxjs/Observable';
 import {flatMap, map, withLatestFrom} from 'rxjs/operators';
 import {isNullOrUndefined} from 'util';
-import {SmartDocUtils} from '../../../view/perspectives/smartdoc/smartdoc.utils';
+import {SmartDocUtils} from '../../../view/perspectives/smartdoc-old/smartdoc.utils';
 import {AppState} from '../app.state';
 import {NotificationsAction} from '../notifications/notifications.action';
 import {ViewsAction} from '../views/views.action';
