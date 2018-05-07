@@ -24,7 +24,6 @@ import {RouterModule} from '@angular/router';
 import {SharedModule} from '../shared/shared.module';
 import {OverwriteViewDialogComponent} from './overwrite-dialog/overwrite-view-dialog.component';
 import {PostItPerspectiveModule} from './perspectives/post-it/post-it-perspective.module';
-import {TablePerspectiveModule} from './perspectives/table/table-perspective.module';
 import {ShareDialogComponent} from './view-controls/share-dialog/share-dialog.component';
 import {ViewControlsComponent} from './view-controls/view-controls.component';
 import {ViewLoadingComponent} from './view-loading.component';
@@ -37,7 +36,6 @@ import {ViewComponent} from './view.component';
     FormsModule,
     RouterModule,
     PostItPerspectiveModule,
-    TablePerspectiveModule,
     SharedModule,
     ViewRoutingModule
   ],

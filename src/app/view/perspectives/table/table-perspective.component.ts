@@ -17,256 +17,130 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {Subscription} from 'rxjs';
-import {Observable} from 'rxjs/Observable';
-import {map, switchMap, withLatestFrom} from 'rxjs/operators';
-import {Attribute, Collection, Document, LinkInstance, LinkType, Query} from '../../../core/dto';
-import {CollectionService, DocumentService, LinkInstanceService, LinkTypeService} from '../../../core/rest';
+import {filter} from 'rxjs/operators';
+import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../../core/store/app.state';
-import {DocumentModel} from '../../../core/store/documents/document.model';
-import {selectNavigation, selectWorkspace} from '../../../core/store/navigation/navigation.state';
+import {LinkInstanceModel} from '../../../core/store/link-instances/link-instance.model';
+import {selectNavigation} from '../../../core/store/navigation/navigation.state';
+import {getNewLinkTypeIdFromQuery, hasQueryNewLink} from '../../../core/store/navigation/query.helper';
 import {QueryModel} from '../../../core/store/navigation/query.model';
-import {TableConfigModel, ViewConfigModel} from '../../../core/store/views/view.model';
-import {selectViewConfig, selectViewsDictionary, selectViewsState} from '../../../core/store/views/views.state';
-import {AttributeHelper} from '../../../shared/utils/attribute-helper';
-import {PerspectiveComponent} from '../perspective.component';
-import {AttributeChangeEvent, DataChangeEvent, LinkInstanceEvent, TableLinkEvent} from './event';
-import {TablePart} from './model';
-import {TableManagerService} from './util/table-manager.service';
+import {DEFAULT_TABLE_ID, TableModel} from '../../../core/store/tables/table.model';
+import {TablesAction} from '../../../core/store/tables/tables.action';
+import {selectTableById} from '../../../core/store/tables/tables.state';
+import {Perspective} from '../perspective';
+import CreateTable = TablesAction.CreateTable;
+import DestroyTable = TablesAction.DestroyTable;
 
 @Component({
   selector: 'table-perspective',
   templateUrl: './table-perspective.component.html',
   styleUrls: ['./table-perspective.component.scss']
 })
-export class TablePerspectiveComponent implements PerspectiveComponent, OnInit, OnDestroy {
+export class TablePerspectiveComponent implements OnInit, OnDestroy {
 
   @Input()
-  public linkedDocument: DocumentModel;
+  public linkInstance: LinkInstanceModel;
 
   @Input()
-  public query: Query;
+  public query: QueryModel;
 
-  @Input()
-  public config: ViewConfigModel = {};
+  public table: TableModel;
+  private tableId: string;
 
-  @Input()
-  public embedded: boolean;
+  private subscriptions = new Subscription();
 
-  @Input()
-  public editable: boolean;
-
-  private linkTypeId: string;
-
-  constructor(private collectionService: CollectionService,
-              private documentService: DocumentService,
-              private linkInstanceService: LinkInstanceService,
-              private linkTypeService: LinkTypeService,
-              private store: Store<AppState>,
-              private tableManagerService: TableManagerService) {
+  public constructor(private store: Store<AppState>) {
   }
-
-  public parts: TablePart[] = [];
-
-  private subscription: Subscription;
 
   public ngOnInit() {
-    if (this.embedded && this.query) {
-      this.linkTypeId = this.query.linkTypeIds[0];
-      this.initTable();
-      return;
-    }
-
-    this.subscription = Observable.combineLatest(
-      this.store.select(selectNavigation),
-      this.store.select(selectViewsDictionary)
-    ).pipe(
-      withLatestFrom(this.store.select(selectViewConfig)),
-      map(([[navigation, views], config]) => {
-        const view = navigation.workspace ? views[navigation.workspace.viewCode] : null;
-        return view ? [navigation.query, view.config] : [navigation.query, config];
-      })
-    ).subscribe(([query, config]: [QueryModel, ViewConfigModel]) => {
-      this.query = query;
-      this.config = config;
-
-      this.initTable();
-    });
-  }
-
-  private initTable() {
-    if (!this.isDisplayable()) {
-      return;
-    }
-
-    this.createDefaultConfigFromQuery();
-    this.fetchDataAndCreateTable();
+    this.tableId = this.createTableId();
+    this.createTableFromQuery();
+    this.subscribeToTable();
   }
 
   public ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
+    this.subscriptions.unsubscribe();
+    this.destroyTable();
+  }
+
+  private createTableFromQuery() {
+    if (this.query) {
+      this.createTable(this.query);
+    } else {
+      this.subscribeToQuery();
     }
   }
 
-  private getTableConfig(): Observable<TableConfigModel> {
-    return this.store.select(selectWorkspace).pipe(
-      switchMap(workspace => {
-        if (workspace.viewCode) {
-          return this.store.select(selectViewsDictionary).pipe(
-            map(views => views[workspace.viewCode].config.table)
-          );
+  private createTable(query: QueryModel) {
+    if (!this.tableId) {
+      throw new Error('tableId has not been set');
+    }
+    this.store.dispatch(new CreateTable({tableId: this.tableId, query}));
+  }
+
+  private destroyTable() {
+    if (!this.tableId || !this.table) {
+      return;
+    }
+    this.store.dispatch(new DestroyTable({tableId: this.tableId}));
+  }
+
+  private subscribeToTable() {
+    this.subscriptions.add(
+      this.store.select(selectTableById(this.tableId)).pipe(
+        filter(table => !!table)
+      ).subscribe(table => this.table = table)
+    );
+  }
+
+  private subscribeToQuery() {
+    this.subscriptions.add(
+      this.store.select(selectNavigation).pipe(
+        filter(navigation => navigation.perspective === Perspective.Table && !!navigation.query)
+      ).subscribe(({query}) => {
+        if (this.table && hasQueryNewLink(this.query, query)) {
+          this.addTablePart(query);
         } else {
-          return this.store.select(selectViewsState).pipe(
-            map(views => views.config.table)
-          );
+          this.refreshTable(query);
         }
+
+        this.query = query;
       })
     );
   }
 
-  private createDefaultConfigFromQuery() {
-    if (!this.config.table) {
-      this.config.table = {
-        parts: [
-          {
-            collectionId: this.query.collectionIds[0],
-            attributeIds: []
-          }
-        ]
-      };
-    }
+  private addTablePart(query: QueryModel) {
+    const linkTypeId = getNewLinkTypeIdFromQuery(this.query, query);
+    this.store.dispatch(new TablesAction.CreatePart({tableId: this.tableId, linkTypeId}));
   }
 
-  private fetchDataAndCreateTable() {
-    this.tableManagerService.createTableFromConfig(this.query, this.config.table, this.linkTypeId, this.linkedDocument)
-      .subscribe(parts => this.parts = parts);
+  private refreshTable(query: QueryModel) {
+    this.destroyTable();
+    this.createTable(query);
+  }
+
+  private createTableId(): string {
+    return this.linkInstance ? this.linkInstance.id : DEFAULT_TABLE_ID;
+  }
+
+  public onClickOutside() {
+    this.store.dispatch(new TablesAction.SetCursor({cursor: null}));
   }
 
   public isDisplayable(): boolean {
-    return this.query && this.query.collectionIds && this.query.collectionIds.length === 1;
+    return this.query && this.query.collectionIds.length === 1;
   }
 
-  public extractConfig(): any {
-    this.config.table = this.tableManagerService.extractTableConfig();
-    return this.config;
-  }
-
-  public onDataChange(event: DataChangeEvent) {
-    if (!event.attribute.fullName) {
-      this.createAttribute(event.collection, event.attribute);
+  public height(element: ElementRef): string {
+    if (this.table.id !== DEFAULT_TABLE_ID) {
+      return 'auto';
     }
 
-    const doc = event.document;
-    doc.data[event.attribute.fullName] = event.value;
-
-    if (doc.id) {
-      this.updateDocument(doc);
-    } else {
-      this.createDocument(doc, () => {
-        if (event.linkedDocument) {
-          this.createLinkInstance(event.linkType, [doc, event.linkedDocument]);
-        }
-      });
-    }
-  }
-
-  private createDocument(doc: Document, successCallback: () => void) {
-    this.documentService.createDocument(doc).subscribe((document: Document) => {
-      this.tableManagerService.documents.push(document);
-
-      successCallback();
-    });
-  }
-
-  private updateDocument(doc: Document) {
-    this.documentService.patchDocumentData(doc).subscribe();
-  }
-
-  public onDeleteDocument(doc: Document) {
-    this.documentService.removeDocument(doc.collectionId, doc.id).subscribe(() => {
-      const index = this.tableManagerService.documents.indexOf(doc);
-      this.tableManagerService.documents.splice(index, 1);
-    });
-  }
-
-  public onCreateAttribute(event: AttributeChangeEvent) {
-    this.createAttribute(event.collection, event.attribute);
-  }
-
-  public onRenameAttribute(event: AttributeChangeEvent) {
-    if (event.attribute.fullName) {
-      this.updateAttribute(event.collection, event.attribute);
-    } else {
-      this.createAttribute(event.collection, event.attribute);
-    }
-  }
-
-  public onDeleteAttribute(event: AttributeChangeEvent) {
-    this.deleteAttribute(event.collection, event.attribute);
-  }
-
-  private createAttribute(collection: Collection, attribute: Attribute) {
-    attribute.fullName = AttributeHelper.generateAttributeId(attribute.name);
-
-    this.collectionService.updateAttribute(collection.id, attribute.fullName, attribute).subscribe(() => {
-      collection.attributes.push(attribute);
-    });
-  }
-
-  private updateAttribute(collection: Collection, attribute: Attribute) {
-    this.collectionService.updateAttribute(collection.id, attribute.fullName, attribute).subscribe();
-  }
-
-  private deleteAttribute(collection: Collection, attribute: Attribute) {
-    this.collectionService.removeAttribute(collection.id, attribute.fullName).subscribe(() => {
-      AttributeHelper.removeAttributeFromArray(attribute, collection.attributes);
-    });
-  }
-
-  public onAddLinkedPart(event: TableLinkEvent) {
-    if (!event.linkType) {
-      event.linkType = this.createLinkType(event.collection);
-    }
-
-    this.tableManagerService.addTablePart(event.linkType, event.collection, event.attribute);
-  }
-
-  private createLinkType(collection: Collection): LinkType {
-    const lastCollection = this.parts[this.parts.length - 1].collection;
-
-    const linkType: LinkType = {
-      name: lastCollection.name + '-' + collection.name, // TODO input from user
-      collectionIds: [lastCollection.id, collection.id]
-    };
-
-    this.linkTypeService.createLinkType(linkType); // TODO not subscribed
-    this.tableManagerService.linkTypes.push(linkType);
-
-    return linkType;
-  }
-
-  public onCreateLinkInstance(event: LinkInstanceEvent) {
-    this.createLinkInstance(event.linkType, event.documents);
-  }
-
-  public onDeleteLinkInstance(linkInstanceId: string) {
-    this.linkInstanceService.deleteLinkInstance(linkInstanceId).subscribe();
-  }
-
-  private createLinkInstance(linkType: LinkType, documents: [Document, Document]) {
-    const linkInstance: LinkInstance = {
-      linkTypeId: linkType.id,
-      documentIds: [documents[0].id, documents[1].id],
-      data: {}
-    };
-
-    this.linkInstanceService.createLinkInstance(linkInstance).subscribe((instance: LinkInstance) => {
-      linkInstance.id = instance.id;
-      this.tableManagerService.linkInstances.push(linkInstance);
-    });
+    const {top} = element['getBoundingClientRect']();
+    const height = window.innerHeight - top;
+    return `${height}px`;
   }
 
 }

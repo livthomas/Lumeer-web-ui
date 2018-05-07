@@ -28,7 +28,6 @@ import {ViewsLoadedGuard} from '../core/guards/view/views-loaded.guard';
 import {WorkspaceGuard} from '../workspace/workspace.guard';
 import {Perspective} from './perspectives/perspective';
 import {PostItPerspectiveComponent} from './perspectives/post-it/post-it-perspective.component';
-import {TablePerspectiveComponent} from './perspectives/table/table-perspective.component';
 import {ViewLoadingComponent} from './view-loading.component';
 import {ViewComponent} from './view.component';
 
@@ -52,15 +51,11 @@ const viewRoutes: Routes = [
       },
       {
         path: Perspective.Table,
-        component: TablePerspectiveComponent
-      },
-      {
-        path: Perspective.Table2,
-        loadChildren: './perspectives/table2/table2-perspective.module#Table2PerspectiveModule',
+        loadChildren: './perspectives/table/table-perspective.module#TablePerspectiveModule',
       },
       {
         path: Perspective.SmartDoc,
-        loadChildren: './perspectives/smartdoc/smartdoc-perspective.module#SmartDocPerspectiveModule',
+        loadChildren: './perspectives/smartdoc-old/smartdoc-perspective.module#SmartDocPerspectiveModule',
       },
       {
         path: '',

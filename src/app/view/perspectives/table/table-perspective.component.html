@@ -1,25 +1,19 @@
 <div *ngIf="!isDisplayable()"
-     class="alert alert-warning"
+     class="alert alert-warning m-3"
      role="alert"
      i18n="@@table.query.invalid">Your query results cannot be shown using table perspective. The query needs to specify exactly one file.
 </div>
 
-<div class="text-center">
-  <div class="d-inline-block text-left">
-    <table *ngIf="isDisplayable()">
-      <table-header [parts]="parts"
-                    [embedded]="embedded"
-                    (createAttribute)="onCreateAttribute($event)"
-                    (renameAttribute)="onRenameAttribute($event)"
-                    (deleteAttribute)="onDeleteAttribute($event)"
-                    (addLinkedPart)="onAddLinkedPart($event)">
-      </table-header>
-      <table-body [parts]="parts"
-                  (dataChange)="onDataChange($event)"
-                  (deleteDocument)="onDeleteDocument($event)"
-                  (createLinkInstance)="onCreateLinkInstance($event)"
-                  (deleteLinkInstance)="onDeleteLinkInstance($event)">
-      </table-body>
-    </table>
-  </div>
+<div #positioner></div>
+<div *ngIf="isDisplayable()"
+     [style.height]="height(positioner)"
+     (clickOutside)="onClickOutside()"
+     class="table d-flex flex-column m-0">
+  <table-header [table]="table">
+  </table-header>
+  <table-body [table]="table"
+              [query]="query">
+  </table-body>
 </div>
+
+<new-link-dialog></new-link-dialog>

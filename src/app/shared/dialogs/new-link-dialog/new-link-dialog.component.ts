@@ -174,7 +174,7 @@ export class NewLinkDialogComponent implements OnInit, OnDestroy, AfterViewInit 
     if (this.perspective === Perspective.SmartDoc && this.selectedSmartDocPart) {
       return this.createAddSmartDocPartAction();
     }
-    if (this.perspective === Perspective.Table2) {
+    if (this.perspective === Perspective.Table) {
       return new NavigationAction.AddLinkToQuery({linkTypeId: null});
     }
     return null;

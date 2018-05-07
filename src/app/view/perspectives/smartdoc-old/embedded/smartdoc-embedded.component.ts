@@ -35,12 +35,10 @@ import {SmartDocPartModel} from '../../../../core/store/smartdoc/smartdoc.model'
 import {PerspectiveDirective} from '../../../../shared/perspective.directive';
 import {Perspective} from '../../perspective';
 import {PerspectiveComponent} from '../../perspective.component';
-import {TablePerspectiveComponent} from '../../table/table-perspective.component';
 import {SmartDocPerspectiveComponent} from '../smartdoc-perspective.component';
 import {SmartDocUtils} from '../smartdoc.utils';
 
 const perspectiveComponents: { [perspective: string]: Type<any> } = {
-  [Perspective.Table]: TablePerspectiveComponent,
   [Perspective.SmartDoc]: SmartDocPerspectiveComponent
 };
 

@@ -17,42 +17,93 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {SharedModule} from '../../../shared/shared.module';
-import {RouterModule} from '@angular/router';
-import {TablePerspectiveComponent} from './table-perspective.component';
-import {TableBodyComponent} from './body/table-body.component';
-import {TableHeaderComponent} from './header/table-header.component';
-import {TableBodyCellComponent} from './body-cell/table-body-cell.component';
-import {TableHeaderCellComponent} from './header-cell/table-header-cell.component';
+import {EffectsModule} from '@ngrx/effects';
+import {StoreModule} from '@ngrx/store';
+import {ResizableModule} from 'angular-resizable-element';
+import {ClickOutsideModule} from 'ng-click-outside';
 import {ContextMenuModule} from 'ngx-contextmenu';
-import {TableManagerService} from './util/table-manager.service';
-import {DragAndDropModule} from '../../../shared/drag-and-drop/drag-and-drop.module';
+import {InfiniteScrollModule} from 'ngx-infinite-scroll';
+import {TablesEffects} from '../../../core/store/tables/tables.effects';
+import {tablesReducer} from '../../../core/store/tables/tables.reducer';
+import {initialTablesState, TABLE_FEATURE_NAME} from '../../../core/store/tables/tables.state';
+import {PickerModule} from '../../../shared/picker/picker.module';
+import {SharedModule} from '../../../shared/shared.module';
+import {TableRowGroupFooterComponent} from './body/row-group/footer/table-row-group-footer.component';
+import {TableRowGroupHeaderComponent} from './body/row-group/header/table-row-group-header.component';
+import {TableRowGroupComponent} from './body/row-group/table-row-group.component';
+import {TableCollapsedCellComponent} from './body/rows/row/cell-group/cell/collapsed-cell/table-collapsed-cell.component';
+import {TableDataCellMenuComponent} from './body/rows/row/cell-group/cell/data-cell/menu/table-data-cell-menu.component';
+import {TableDataCellSuggestionsComponent} from './body/rows/row/cell-group/cell/data-cell/suggestions/table-data-cell-suggestions.component';
+import {TableDataCellComponent} from './body/rows/row/cell-group/cell/data-cell/table-data-cell.component';
+import {TableCellComponent} from './body/rows/row/cell-group/cell/table-cell.component';
+import {TableCellGroupComponent} from './body/rows/row/cell-group/table-cell-group.component';
+import {TableLinkCellComponent} from './body/rows/row/link-cell/table-link-cell.component';
+import {TableRowNumbersComponent} from './body/rows/row/row-numbers/table-row-numbers.component';
+import {TableRowComponent} from './body/rows/row/table-row.component';
+import {TableRowsComponent} from './body/rows/table-rows.component';
+import {TableBodyComponent} from './body/table-body.component';
+import {TableCaptionComponent} from './header/collection/caption/table-caption.component';
+import {TableHeaderCollectionComponent} from './header/collection/table-header-collection.component';
+import {TableCompoundColumnComponent} from './header/column-group/compound-column/table-compound-column.component';
+import {TableHiddenColumnComponent} from './header/column-group/hidden-column/table-hidden-column.component';
+import {TableAttributeSuggestionsComponent} from './header/column-group/single-column/attribute-suggestions/table-attribute-suggestions.component';
+import {TableColumnContextMenuComponent} from './header/column-group/single-column/context-menu/table-column-context-menu.component';
+import {TableSingleColumnComponent} from './header/column-group/single-column/table-single-column.component';
+import {TableColumnGroupComponent} from './header/column-group/table-column-group.component';
+import {TableLinkInfoComponent} from './header/link/info/table-link-info.component';
+import {TableHeaderLinkComponent} from './header/link/table-header-link.component';
+import {TableHeaderComponent} from './header/table-header.component';
+import {TableEditableCellComponent} from './shared/editable-cell/table-editable-cell.component';
+import {TablePerspectiveRoutingModule} from './table-perspective-routing.module';
+import {TablePerspectiveComponent} from './table-perspective.component';
 
 @NgModule({
   imports: [
-    RouterModule,
     SharedModule,
+    CommonModule,
+    PickerModule,
+    StoreModule.forFeature(TABLE_FEATURE_NAME, tablesReducer, {initialState: initialTablesState}),
+    EffectsModule.forFeature([TablesEffects]),
     ContextMenuModule,
-    DragAndDropModule
+    ClickOutsideModule,
+    ResizableModule,
+    InfiniteScrollModule,
+    TablePerspectiveRoutingModule
   ],
   declarations: [
     TablePerspectiveComponent,
-    TableBodyComponent,
-    TableBodyCellComponent,
     TableHeaderComponent,
-    TableHeaderCellComponent
-  ],
-  providers: [
-    TableManagerService
-  ],
-  entryComponents: [
-    TablePerspectiveComponent
+    TableHeaderCollectionComponent,
+    TableHeaderLinkComponent,
+    TableCaptionComponent,
+    TableColumnGroupComponent,
+    TableSingleColumnComponent,
+    TableCompoundColumnComponent,
+    TableLinkInfoComponent,
+    TableHiddenColumnComponent,
+    TableColumnContextMenuComponent,
+    TableAttributeSuggestionsComponent,
+    TableBodyComponent,
+    TableRowGroupComponent,
+    TableRowGroupHeaderComponent,
+    TableRowGroupFooterComponent,
+    TableRowComponent,
+    TableCellGroupComponent,
+    TableDataCellComponent,
+    TableLinkCellComponent,
+    TableRowsComponent,
+    TableCellComponent,
+    TableEditableCellComponent,
+    TableDataCellMenuComponent,
+    TableCollapsedCellComponent,
+    TableRowNumbersComponent,
+    TableDataCellSuggestionsComponent
   ],
   exports: [
     TablePerspectiveComponent
   ]
 })
 export class TablePerspectiveModule {
-
 }
