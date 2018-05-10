@@ -1,0 +1,9 @@
+.drag-panel {
+  cursor: move;
+
+  &:hover {
+    .grip-handle {
+      color: white;
+    }
+  }
+}

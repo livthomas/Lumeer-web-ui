@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 
 @Component({
   selector: 'grip-handle',
@@ -25,17 +25,9 @@ import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./grip-handle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GripHandleComponent implements OnInit {
+export class GripHandleComponent {
 
   @Input()
-  public columns: number = 2;
-
-  @Input()
-  public rows: number = 3;
-
-  constructor() { }
-
-  ngOnInit() {
-  }
+  public hidden: boolean;
 
 }

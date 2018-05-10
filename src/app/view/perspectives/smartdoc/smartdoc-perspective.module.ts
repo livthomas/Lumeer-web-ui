@@ -5,6 +5,8 @@ import {StoreModule} from '@ngrx/store';
 import {SmartDocEffects} from '../../../core/store/smartdoc/smartdoc.effects';
 import {smartDocReducer} from '../../../core/store/smartdoc/smartdoc.reducer';
 import {initialSmartDocState} from '../../../core/store/smartdoc/smartdoc.state';
+import {PickerModule} from '../../../shared/picker/picker.module';
+import {SharedModule} from '../../../shared/shared.module';
 import {TablePerspectiveModule} from '../table/table-perspective.module';
 import {SmartdocCollectionPanelComponent} from './documents-list/collection-panel/smartdoc-collection-panel.component';
 import {SmartdocEmbeddedComponent} from './documents-list/document/embedded/smartdoc-embedded.component';
@@ -20,6 +22,8 @@ import {SmartdocToolbarComponent} from './toolbar/smartdoc-toolbar.component';
 @NgModule({
   imports: [
     CommonModule,
+    PickerModule,
+    SharedModule,
     StoreModule.forFeature('smartDoc', smartDocReducer, {initialState: initialSmartDocState}),
     EffectsModule.forFeature([SmartDocEffects]),
     TablePerspectiveModule

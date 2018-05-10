@@ -1,8 +1,11 @@
-<div *ngFor="let doc of documents$ | async"
+<div *ngFor="let doc of documents"
      [class.primary-document]="primary"
      [class.rounded]="primary"
      class="d-flex">
-  <smartdoc-collection-panel></smartdoc-collection-panel>
+  <smartdoc-collection-panel *ngIf="collection"
+                             [collection]="collection"
+                             [cursor]="cursor">
+  </smartdoc-collection-panel>
   <smartdoc-document [cursor]="createDocumentCursor(doc.id)"
                      [document]="doc">
   </smartdoc-document>

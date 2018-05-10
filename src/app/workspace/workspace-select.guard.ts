@@ -31,6 +31,7 @@ import {selectSelectedOrganization} from '../core/store/organizations/organizati
 import {ProjectsAction} from '../core/store/projects/projects.action';
 import {selectSelectedProject} from '../core/store/projects/projects.state';
 import {UserSettingsService} from '../core/user-settings.service';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 
 @Injectable()
 export class WorkspaceSelectGuard implements CanActivate {
@@ -57,7 +58,7 @@ export class WorkspaceSelectGuard implements CanActivate {
   }
 
   private isSomethingSelected(): Observable<boolean> {
-    return Observable.combineLatest(
+    return combineLatest(
       this.store.select(selectSelectedOrganization),
       this.store.select(selectSelectedProject)
     ).pipe(

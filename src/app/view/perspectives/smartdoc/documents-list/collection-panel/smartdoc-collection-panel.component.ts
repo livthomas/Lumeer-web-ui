@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, HostListener, Input} from '@angular/core';
 import {CollectionModel} from '../../../../../core/store/collections/collection.model';
 import {SmartDocCursor} from '../../../../../core/store/smartdoc/smartdoc.model';
 
@@ -14,5 +14,21 @@ export class SmartdocCollectionPanelComponent {
 
   @Input()
   public cursor: SmartDocCursor;
+
+  public hovered: boolean;
+
+  @HostListener('mouseenter')
+  public onMouseEnter() {
+    this.hovered = true;
+  }
+
+  @HostListener('mouseleave')
+  public onMouseLeave() {
+    this.hovered = false;
+  }
+
+  public borderRight(): string {
+    return `3px solid ${this.collection.color}`;
+  }
 
 }

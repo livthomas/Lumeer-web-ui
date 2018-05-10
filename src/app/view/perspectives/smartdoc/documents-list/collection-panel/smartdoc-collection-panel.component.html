@@ -1,3 +1,12 @@
-<p>
-  smartdoc-collection-panel works!
-</p>
+<div [style.border-right]="borderRight()"
+     class="d-flex flex-column h-100 drag-panel">
+  <icons-presenter [colors]="[collection.color]"
+                   [icons]="[collection.icon]"
+                   [title]="collection.name">
+  </icons-presenter>
+  <div class="flex-grow-1 d-flex flex-column justify-content-center align-items-center grip-handle"
+       title="Move document"
+       i18n-title="@@smartdoc.collection.panel.move.document">
+    <grip-handle [hidden]="!hovered"></grip-handle>
+  </div>
+</div>
