@@ -22,6 +22,7 @@ import {Actions, Effect, ofType} from '@ngrx/effects';
 import {Action, Store} from '@ngrx/store';
 import {I18n} from '@ngx-translate/i18n-polyfill';
 import {Observable} from 'rxjs/Observable';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 import {map, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {AppState} from '../app.state';
 import {selectCollectionsDictionary} from '../collections/collections.state';
@@ -40,14 +41,14 @@ export class SmartDocEffects {
   @Effect()
   public create$: Observable<Action> = this.actions$.pipe(
     ofType<SmartDocAction.Create>(SmartDocActionType.CREATE),
-    mergeMap(() => Observable.combineLatest(
+    mergeMap(() => combineLatest(
       this.store$.select(selectQuery),
       this.store$.select(selectViewSmartDocConfig),
       this.store$.select(selectCollectionsDictionary),
       this.store$.select(selectLinkTypesDictionary)
     )),
     map(([query, config, collectionsMap, linkTypesMap]) => {
-      const smartDoc = smartDocConfigFollowsQuery(config, query, linkTypesMap) ?
+      const smartDoc = config && smartDocConfigFollowsQuery(config, query, linkTypesMap) ?
         createSmartDocFromConfig(config) : createSmartDocFromQuery(query, collectionsMap, linkTypesMap);
       return new SmartDocAction.CreateSuccess({smartDoc});
     })

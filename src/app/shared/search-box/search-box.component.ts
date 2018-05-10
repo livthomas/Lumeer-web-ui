@@ -20,8 +20,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {Store} from '@ngrx/store';
-import {ViewQueryItem} from './query-item/model/view.query-item';
 import {Observable} from 'rxjs/Observable';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 import {filter, flatMap, map} from 'rxjs/operators';
 import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../core/store/app.state';
@@ -35,6 +35,7 @@ import {Perspective} from '../../view/perspectives/perspective';
 import {QueryData} from './query-data';
 import {QueryItem} from './query-item/model/query-item';
 import {QueryItemType} from './query-item/model/query-item-type';
+import {ViewQueryItem} from './query-item/model/view.query-item';
 import {QueryItemsConverter} from './query-item/query-items.converter';
 
 @Component({
@@ -62,7 +63,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
 
   private subscribeToQuery() {
     this.querySubscription = this.store.select(selectQuery).pipe(
-      flatMap(query => Observable.combineLatest(
+      flatMap(query => combineLatest(
         Observable.of(query),
         this.loadData(query)
       )),
@@ -81,7 +82,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
   }
 
   private loadData(query: QueryModel): Observable<QueryData> {
-    return Observable.combineLatest(
+    return combineLatest(
       this.store.select(selectAllCollections),
       this.store.select(selectAllLinkTypes)
     ).pipe(
