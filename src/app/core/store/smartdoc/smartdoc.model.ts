@@ -20,12 +20,62 @@
 import {Perspective} from '../../../view/perspectives/perspective';
 
 export enum SmartDocPartType {
-  Attachments = 'attachments',
+
   Embedded = 'embedded',
   Text = 'text'
+
 }
 
-export interface SmartDocPartModel {
+export interface SmartDocModel {
+
+  collectionId: string;
+  documentIdsOrder?: string[];
+  parts: SmartDocPart[];
+
+}
+
+export interface SmartDocPart {
+
+  type: SmartDocPartType;
+
+}
+
+export class SmartDocTextPart {
+
+  public readonly type = SmartDocPartType.Text;
+
+  public constructor(public text: string) {
+  }
+
+}
+
+export class SmartDocEmbeddedPart {
+
+  public readonly type = SmartDocPartType.Embedded;
+
+  public constructor(public linkTypeId: string,
+                     public perspective: Perspective,
+                     public smartDoc?: SmartDocModel) {
+  }
+
+}
+
+export interface SmartDocCursor {
+
+  documentIdsPath: string[];
+  partPath: number[];
+
+}
+
+export interface SmartDocConfig {
+
+  collectionId: string;
+  documentIdsOrder?: string[];
+  parts: SmartDocConfigPart[];
+
+}
+
+export interface SmartDocConfigPart {
 
   type: SmartDocPartType;
 
@@ -34,14 +84,6 @@ export interface SmartDocPartModel {
 
   linkTypeId?: string;
   perspective?: Perspective;
-  smartDoc?: SmartDocModel;
-
-}
-
-export interface SmartDocModel {
-
-  collectionId: string;
-  documentIdsOrder?: string[];
-  parts: SmartDocPartModel[];
+  smartDoc?: SmartDocConfig;
 
 }

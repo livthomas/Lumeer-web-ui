@@ -18,25 +18,25 @@
  */
 
 import {createFeatureSelector, createSelector} from '@ngrx/store';
-
-export interface SelectedSmartDocPart {
-
-  path: number[];
-  documentId: string;
-  partIndex: number;
-
-}
+import {SmartDocCursor, SmartDocModel} from './smartdoc.model';
+import {findSmartDocByCursor, findSmartDocPartByPath} from './smartdoc.utils';
 
 export interface SmartDocState {
 
-  selectedPart: SelectedSmartDocPart;
+  smartDoc: SmartDocModel;
+  cursor: SmartDocCursor;
 
 }
 
 export const initialSmartDocState: SmartDocState = {
-  selectedPart: null
+  smartDoc: null,
+  cursor: null
 };
 
 export const selectSmartDocState = createFeatureSelector<SmartDocState>('smartDoc');
 
-export const selectSelectedSmartDocPart = createSelector(selectSmartDocState, templateState => templateState.selectedPart);
+export const selectSmartDoc = createSelector(selectSmartDocState, state => state.smartDoc);
+export const selectSmartDocPartByPath = (partPath: number[]) => createSelector(selectSmartDoc, smartDoc => findSmartDocPartByPath(smartDoc, partPath));
+export const selectSmartDocByCursor = (cursor: SmartDocCursor) => createSelector(selectSmartDoc, smartDoc => findSmartDocByCursor(smartDoc, cursor));
+
+export const selectSmartDocCursor = createSelector(selectSmartDocState, state => state.cursor);

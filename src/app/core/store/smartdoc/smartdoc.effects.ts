@@ -22,15 +22,13 @@ import {Actions, Effect, ofType} from '@ngrx/effects';
 import {Action, Store} from '@ngrx/store';
 import {I18n} from '@ngx-translate/i18n-polyfill';
 import {Observable} from 'rxjs/Observable';
-import {flatMap, map, withLatestFrom} from 'rxjs/operators';
-import {isNullOrUndefined} from 'util';
-import {SmartDocUtils} from '../../../view/perspectives/smartdoc-old/smartdoc.utils';
+import {map, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {AppState} from '../app.state';
 import {NotificationsAction} from '../notifications/notifications.action';
-import {ViewsAction} from '../views/views.action';
-import {selectViewSmartDocConfig} from '../views/views.state';
 import {SmartDocAction, SmartDocActionType} from './smartdoc.action';
-import {SmartDocModel} from './smartdoc.model';
+import {SmartDocEmbeddedPart} from './smartdoc.model';
+import {selectSmartDoc, selectSmartDocPartByPath} from './smartdoc.state';
+import {findSmartDocPartByPath} from './smartdoc.utils';
 
 @Injectable()
 export class SmartDocEffects {
@@ -38,63 +36,27 @@ export class SmartDocEffects {
   @Effect()
   public addPart$: Observable<Action> = this.actions$.pipe(
     ofType<SmartDocAction.AddPart>(SmartDocActionType.ADD_PART),
-    withLatestFrom(this.store$.select(selectViewSmartDocConfig)),
-    map(([action, smartDocConfig]) => {
-      const config = SmartDocEffects.modifyInnerSmartDoc(smartDocConfig, action.payload.partPath, innerSmartDoc => {
-        if (!isNullOrUndefined(action.payload.partIndex)) {
-          innerSmartDoc.parts.splice(action.payload.partIndex, 0, action.payload.part);
-        } else {
-          innerSmartDoc.parts = innerSmartDoc.parts.concat(action.payload.part);
-        }
-        return innerSmartDoc;
-      });
-      return new ViewsAction.ChangeSmartDocConfig({config});
-    })
-  );
-
-  @Effect()
-  public updatePart$: Observable<Action> = this.actions$.pipe(
-    ofType<SmartDocAction.UpdatePart>(SmartDocActionType.UPDATE_PART),
-    withLatestFrom(this.store$.select(selectViewSmartDocConfig)),
-    map(([action, smartDocConfig]) => {
-      const config = SmartDocEffects.modifyInnerSmartDoc(smartDocConfig, action.payload.partPath, innerSmartDoc => {
-        innerSmartDoc.parts.splice(action.payload.partIndex, 1, action.payload.part);
-        return innerSmartDoc;
-      });
-      return new ViewsAction.ChangeSmartDocConfig({config});
+    mergeMap(action => this.store$.select(selectSmartDocPartByPath(action.payload.parentPath)).pipe(
+      map(parentPart => ({action, parentPart}))
+    )),
+    map(({action, parentPart}) => {
+      const index = (parentPart as SmartDocEmbeddedPart).smartDoc.parts.length - 1;
+      const partPath = action.payload.parentPath.concat(index);
+      return new SmartDocAction.ReplacePart({partPath, deleteCount: 0, part: action.payload.part});
     })
   );
 
   @Effect()
   public removePart$: Observable<Action> = this.actions$.pipe(
     ofType<SmartDocAction.RemovePart>(SmartDocActionType.REMOVE_PART),
-    withLatestFrom(this.store$.select(selectViewSmartDocConfig)),
-    flatMap(([action, smartDocConfig]) => {
-      const config = SmartDocEffects.modifyInnerSmartDoc(smartDocConfig, action.payload.partPath, innerSmartDoc => {
-        innerSmartDoc.parts.splice(action.payload.partIndex, 1);
-        return innerSmartDoc;
-      });
-
-      const actions: Action[] = [new ViewsAction.ChangeSmartDocConfig({config})];
-      if (action.payload.last) {
-        const part = SmartDocUtils.createEmptyTextPart();
-        actions.push(new SmartDocAction.AddPart({partPath: action.payload.partPath, part}));
-      }
-      return actions;
-    })
-  );
-
-  @Effect()
-  public removePartConfirm$: Observable<Action> = this.actions$.pipe(
-    ofType<SmartDocAction.RemovePartConfirm>(SmartDocActionType.REMOVE_PART_CONFIRM),
-    map((action: SmartDocAction.RemovePartConfirm) => {
+    map(action => {
       const title = this.i18n({id: 'smartdoc.remove.part.dialog.title', value: 'Remove part'});
       const message = this.i18n({id: 'smartdoc.remove.part.dialog.message', value: 'Do you really want to remove this template part?'});
 
       return new NotificationsAction.Confirm({
         title,
         message,
-        action: new SmartDocAction.RemovePart(action.payload)
+        action: new SmartDocAction.ReplacePart({partPath: action.payload.partPath, deleteCount: 1})
       });
     })
   );
@@ -102,48 +64,20 @@ export class SmartDocEffects {
   @Effect()
   public movePart$: Observable<Action> = this.actions$.pipe(
     ofType<SmartDocAction.MovePart>(SmartDocActionType.MOVE_PART),
-    withLatestFrom(this.store$.select(selectViewSmartDocConfig)),
-    map(([action, smartDocConfig]) => {
-      const config = SmartDocEffects.modifyInnerSmartDoc(smartDocConfig, action.payload.partPath, innerSmartDoc => {
-        innerSmartDoc.parts.splice(action.payload.newIndex, 0, innerSmartDoc.parts.splice(action.payload.oldIndex, 1)[0]);
-        return innerSmartDoc;
-      });
-      return new ViewsAction.ChangeSmartDocConfig({config});
-    })
-  );
-
-  @Effect()
-  public orderDocuments$: Observable<Action> = this.actions$.pipe(
-    ofType<SmartDocAction.OrderDocuments>(SmartDocActionType.ORDER_DOCUMENTS),
-    withLatestFrom(this.store$.select(selectViewSmartDocConfig)),
-    map(([action, smartDocConfig]) => {
-      const config = SmartDocEffects.modifyInnerSmartDoc(smartDocConfig, action.payload.partPath, innerSmartDoc => {
-        innerSmartDoc.documentIdsOrder = action.payload.documentIds;
-        return innerSmartDoc;
-      });
-      return new ViewsAction.ChangeSmartDocConfig({config});
+    withLatestFrom(this.store$.select(selectSmartDoc)),
+    mergeMap(([action, smartDoc]) => {
+      const {parentPath, oldIndex, newIndex} = action.payload;
+      const part = findSmartDocPartByPath(smartDoc, parentPath.concat(oldIndex));
+      return [
+        new SmartDocAction.ReplacePart({partPath: parentPath.concat(oldIndex), deleteCount: 1}),
+        new SmartDocAction.ReplacePart({partPath: parentPath.concat(newIndex - (newIndex > oldIndex ? 1 : 0)), deleteCount: 0, part})
+      ];
     })
   );
 
   constructor(private actions$: Actions,
               private i18n: I18n,
               private store$: Store<AppState>) {
-  }
-
-  private static modifyInnerSmartDoc(smartDoc: SmartDocModel, path: number[], modify: (inner: SmartDocModel) => SmartDocModel): SmartDocModel {
-    if (path.length === 0) {
-      return modify({...smartDoc, parts: [...smartDoc.parts]});
-    }
-
-    const index = path[0];
-
-    const part = {...smartDoc.parts[index]};
-    part.smartDoc = SmartDocEffects.modifyInnerSmartDoc(part.smartDoc, path.slice(1), modify);
-
-    const modifiedSmartDoc = {...smartDoc, parts: [...smartDoc.parts]};
-    modifiedSmartDoc.parts.splice(index, 1, part);
-
-    return modifiedSmartDoc;
   }
 
 }

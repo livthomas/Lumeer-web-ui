@@ -24,23 +24,23 @@ import {RouterModule} from '@angular/router';
 import {CommentsComponent} from './comments/comments.component';
 import {DialogsModule} from './dialogs/dialogs.module';
 import {DragAndDropModule} from './drag-and-drop/drag-and-drop.module';
+import {GripHandleComponent} from './grip-handle/grip-handle.component';
+import {InputModule} from './input/input.module';
 import {LinksComponent} from './links/links.component';
-
 import {PerspectiveDirective} from './perspective.directive';
 import {PickerModule} from './picker/picker.module';
-import {PostItCollectionsComponent} from './post-it-collections/post-it-collections.component';
-import {SearchBoxModule} from './search-box/search-box.module';
-import {SizeSliderComponent} from './slider/size-slider.component';
-import {LayoutItem} from './utils/layout/layout-item.directive';
-import {PostItCollectionNameComponent} from './post-it-collections/collection-name/post-it-collection-name.component';
 import {RemovePlaceholderOnFocusDirective} from './placeholder/remove-placeholder-on-focus';
 import {PostItCollectionAddButtonComponent} from './post-it-collections/add-button/post-it-collection-add-button.component';
+import {PostItCollectionNameComponent} from './post-it-collections/collection-name/post-it-collection-name.component';
 import {PostItCollectionImportButtonComponent} from './post-it-collections/import-button/post-it-collection-import-button.component';
-import {SliderComponent} from './slider/slider.component';
-import {UsersModule} from "./users/users.module";
-import {TagModule} from "./tag/tag.module";
-import {InputModule} from "./input/input.module";
+import {PostItCollectionsComponent} from './post-it-collections/post-it-collections.component';
 import {ResourceHeaderComponent} from './resource/header/resource-header.component';
+import {SearchBoxModule} from './search-box/search-box.module';
+import {SizeSliderComponent} from './slider/size-slider.component';
+import {SliderComponent} from './slider/slider.component';
+import {TagModule} from './tag/tag.module';
+import {UsersModule} from './users/users.module';
+import {LayoutItem} from './utils/layout/layout-item.directive';
 
 @NgModule({
   imports: [
@@ -68,7 +68,8 @@ import {ResourceHeaderComponent} from './resource/header/resource-header.compone
     LayoutItem,
     SliderComponent,
     LayoutItem,
-    ResourceHeaderComponent
+    ResourceHeaderComponent,
+    GripHandleComponent
   ],
   exports: [
     CommonModule,
@@ -86,7 +87,8 @@ import {ResourceHeaderComponent} from './resource/header/resource-header.compone
     TagModule,
     InputModule,
     DialogsModule,
-    ResourceHeaderComponent
+    ResourceHeaderComponent,
+    GripHandleComponent
   ]
 })
 export class SharedModule {

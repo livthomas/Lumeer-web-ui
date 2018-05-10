@@ -1,0 +1,14 @@
+<smartdoc-documents-list *ngIf="isSmartDocPerspective()"
+                         [cursor]="cursor"
+                         [linkedDocument]="document"
+                         [query]="query">
+</smartdoc-documents-list>
+
+<div *ngIf="isTablePerspective()"
+     class="d-flex">
+  <smartdoc-collection-panel></smartdoc-collection-panel>
+  <table-perspective [linkedDocumentId]="document.id"
+                     [linkTypeId]="part.linkTypeId"
+                     [query]="query">
+  </table-perspective>
+</div>

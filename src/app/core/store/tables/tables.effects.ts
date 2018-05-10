@@ -37,7 +37,7 @@ import {QueryConverter} from '../navigation/query.converter';
 import {QueryModel} from '../navigation/query.model';
 import {RouterAction} from '../router/router.action';
 import {ViewsAction} from '../views/views.action';
-import {selectViewTable2Config} from '../views/views.state';
+import {selectViewTableConfig} from '../views/views.state';
 import {moveTableCursor} from './table-cursor';
 import {convertTableToConfig} from './table.converter';
 import {DEFAULT_TABLE_ID, EMPTY_TABLE_ROW, TableColumn, TableColumnType, TableCompoundColumn, TableHiddenColumn, TableModel, TablePart, TableRow, TableSingleColumn} from './table.model';
@@ -52,7 +52,7 @@ export class TablesEffects {
   public createTable$: Observable<Action> = this.actions$.pipe(
     ofType<TablesAction.CreateTable>(TablesActionType.CREATE_TABLE),
     withLatestFrom(
-      this.store$.select(selectViewTable2Config),
+      this.store$.select(selectViewTableConfig),
       this.store$.select(selectCollectionsLoaded).pipe(
         skipWhile(loaded => !loaded),
         mergeMap(() => this.store$.select(selectAllCollections))
@@ -106,7 +106,7 @@ export class TablesEffects {
       const actions: Action[] = [new TablesAction.RemoveTable({tableId: table.id})];
 
       if (table.id === DEFAULT_TABLE_ID) {
-        actions.push(new ViewsAction.ChangeTable2Config({config: convertTableToConfig(table)}));
+        actions.push(new ViewsAction.ChangeTableConfig({config: convertTableToConfig(table)}));
       }
 
       return actions;

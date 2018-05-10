@@ -22,7 +22,8 @@ import {Store} from '@ngrx/store';
 import {filter} from 'rxjs/operators';
 import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../../core/store/app.state';
-import {LinkInstanceModel} from '../../../core/store/link-instances/link-instance.model';
+import {DocumentModel} from '../../../core/store/documents/document.model';
+import {LinkTypeModel} from '../../../core/store/link-types/link-type.model';
 import {selectNavigation} from '../../../core/store/navigation/navigation.state';
 import {getNewLinkTypeIdFromQuery, hasQueryNewLink} from '../../../core/store/navigation/query.helper';
 import {QueryModel} from '../../../core/store/navigation/query.model';
@@ -41,7 +42,10 @@ import DestroyTable = TablesAction.DestroyTable;
 export class TablePerspectiveComponent implements OnInit, OnDestroy {
 
   @Input()
-  public linkInstance: LinkInstanceModel;
+  public linkedDocumentId: string;
+
+  @Input()
+  public linkTypeId: string;
 
   @Input()
   public query: QueryModel;
@@ -122,7 +126,11 @@ export class TablePerspectiveComponent implements OnInit, OnDestroy {
   }
 
   private createTableId(): string {
-    return this.linkInstance ? this.linkInstance.id : DEFAULT_TABLE_ID;
+    if (!this.linkedDocumentId && !this.linkTypeId) {
+      return DEFAULT_TABLE_ID;
+    }
+
+    return `${this.linkTypeId}:${this.linkedDocumentId}`;
   }
 
   public onClickOutside() {

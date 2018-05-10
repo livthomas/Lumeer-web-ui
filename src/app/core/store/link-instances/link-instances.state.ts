@@ -49,6 +49,9 @@ export const selectLinkInstancesByIds = (ids: string[]) => createSelector(select
 export const selectLinkInstancesByType = (linkTypeId: string) => createSelector(selectAllLinkInstances,
   linkInstances => linkInstances.filter(linkInstance => linkInstance.linkTypeId === linkTypeId));
 
+export const selectLinkInstancesByTypeAndDocument = (linkTypeId: string, documentId: string) =>
+  createSelector(selectLinkInstancesByType(linkTypeId), linkInstances =>
+    linkInstances.filter(linkInstance => linkInstance.documentIds.some(id => documentId === id)));
 export const selectLinkInstancesByTypeAndDocuments = (linkTypeId: string, documentIds: string[]) =>
   createSelector(selectLinkInstancesByType(linkTypeId), linkInstances =>
     linkInstances.filter(linkInstance => linkInstance.documentIds.some(id => documentIds.includes(id))));

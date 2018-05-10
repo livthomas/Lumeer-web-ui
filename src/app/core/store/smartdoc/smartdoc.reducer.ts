@@ -18,14 +18,38 @@
  */
 
 import {SmartDocAction, SmartDocActionType} from './smartdoc.action';
+import {SmartDocEmbeddedPart, SmartDocPart} from './smartdoc.model';
 import {initialSmartDocState, SmartDocState} from './smartdoc.state';
 
 export function smartDocReducer(state: SmartDocState = initialSmartDocState,
                                 action: SmartDocAction.All): SmartDocState {
   switch (action.type) {
-    case SmartDocActionType.SELECT:
-      return {...state, selectedPart: action.payload};
+    case SmartDocActionType.REPLACE_PART:
+      return replacePart(state, action);
+    case SmartDocActionType.SET_CURSOR:
+      return {...state, cursor: action.payload.cursor};
     default:
       return state;
   }
+}
+
+function replacePart(state: SmartDocState, action: SmartDocAction.ReplacePart): SmartDocState {
+  const {partPath, deleteCount, part} = action.payload;
+
+  const parts = replaceParts(state.smartDoc.parts, partPath, deleteCount, part);
+  const smartDoc = {...state.smartDoc, parts};
+  return {...state, smartDoc};
+}
+
+function replaceParts(parts: SmartDocPart[], partPath: number[], deleteCount: number, part?: SmartDocPart): SmartDocPart[] {
+  const index = partPath[0];
+
+  if (partPath.length === 1) {
+    const updatedParts = parts.slice();
+    updatedParts.splice(index, deleteCount, part || undefined);
+    return updatedParts;
+  }
+
+  const {smartDoc} = parts[index] as SmartDocEmbeddedPart;
+  return replaceParts(smartDoc.parts, partPath.slice(1), deleteCount, part);
 }

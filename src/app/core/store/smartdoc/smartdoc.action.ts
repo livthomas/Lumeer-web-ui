@@ -18,18 +18,16 @@
  */
 
 import {Action} from '@ngrx/store';
-import {SmartDocPartModel} from './smartdoc.model';
+import {SmartDocCursor, SmartDocPart} from './smartdoc.model';
 
 export enum SmartDocActionType {
 
   ADD_PART = '[Smart Document] Add Part',
-  UPDATE_PART = '[Smart Document] Update Part',
-  REMOVE_PART = '[Smart Document] Remove Part',
-  REMOVE_PART_CONFIRM = '[Smart Document] Remove Part Confirm',
+  REPLACE_PART = '[Smart Document] Replace Part',
   MOVE_PART = '[Smart Document] Move Part',
-  ORDER_DOCUMENTS = '[Smart Document] Order Documents',
+  REMOVE_PART = '[Smart Document] Remove Part',
 
-  SELECT = '[SmartDoc Templates] Select'
+  SET_CURSOR = '[SmartDoc Document] Set Cursor'
 
 }
 
@@ -38,53 +36,37 @@ export namespace SmartDocAction {
   export class AddPart implements Action {
     public readonly type = SmartDocActionType.ADD_PART;
 
-    public constructor(public payload: { partPath: number[], partIndex?: number, part: SmartDocPartModel }) {
+    public constructor(public payload: { parentPath: number[], part: SmartDocPart }) {
     }
   }
 
-  export class UpdatePart implements Action {
-    public readonly type = SmartDocActionType.UPDATE_PART;
+  export class ReplacePart implements Action {
+    public readonly type = SmartDocActionType.REPLACE_PART;
 
-    public constructor(public payload: { partPath: number[], partIndex: number, part: SmartDocPartModel }) {
-    }
-  }
-
-  export class RemovePart implements Action {
-    public readonly type = SmartDocActionType.REMOVE_PART;
-
-    public constructor(public payload: { partPath: number[], partIndex: number, last: boolean }) {
-    }
-  }
-
-  export class RemovePartConfirm implements Action {
-    public readonly type = SmartDocActionType.REMOVE_PART_CONFIRM;
-
-    public constructor(public payload: { partPath: number[], partIndex: number, last: boolean }) {
+    public constructor(public payload: { partPath: number[], deleteCount: number, part?: SmartDocPart }) {
     }
   }
 
   export class MovePart implements Action {
     public readonly type = SmartDocActionType.MOVE_PART;
 
-    public constructor(public payload: { partPath: number[], oldIndex: number, newIndex: number }) {
+    public constructor(public payload: { parentPath: number[], oldIndex: number, newIndex: number }) {
     }
   }
 
-  export class OrderDocuments implements Action {
-    public readonly type = SmartDocActionType.ORDER_DOCUMENTS;
+  export class RemovePart implements Action {
+    public readonly type = SmartDocActionType.REMOVE_PART;
 
-    public constructor(public payload: { partPath: number[], documentIds: string[] }) {
+    public constructor(public payload: { partPath: number[] }) {
     }
   }
 
-  export class Select implements Action {
-    public readonly type = SmartDocActionType.SELECT;
+  export class SetCursor implements Action {
+    public readonly type = SmartDocActionType.SET_CURSOR;
 
-    public constructor(public payload: { path: number[], documentId: string, partIndex: number }) {
+    public constructor(public payload: { cursor: SmartDocCursor }) {
     }
   }
 
-  export type All = AddPart | UpdatePart | RemovePart | RemovePartConfirm | MovePart |
-    OrderDocuments |
-    Select;
+  export type All = AddPart | ReplacePart | MovePart | SetCursor;
 }

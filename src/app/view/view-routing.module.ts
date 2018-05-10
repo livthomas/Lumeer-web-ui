@@ -55,7 +55,7 @@ const viewRoutes: Routes = [
       },
       {
         path: Perspective.SmartDoc,
-        loadChildren: './perspectives/smartdoc-old/smartdoc-perspective.module#SmartDocPerspectiveModule',
+        loadChildren: './perspectives/smartdoc/smartdoc-perspective.module#SmartdocPerspectiveModule',
       },
       {
         path: '',

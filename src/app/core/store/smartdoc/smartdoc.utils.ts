@@ -17,38 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Perspective} from '../../../view/perspectives/perspective';
-import {ResourceModel} from '../../model/resource.model';
-import {QueryModel} from '../navigation/query.model';
-import {SmartDocConfig} from '../smartdoc/smartdoc.model';
-import {TableConfig} from '../tables/table.model';
+import {SmartDocCursor, SmartDocEmbeddedPart, SmartDocModel, SmartDocPart} from './smartdoc.model';
 
-export interface ViewModel extends ResourceModel {
+export function findSmartDocByCursor(smartDoc: SmartDocModel, cursor: SmartDocCursor): SmartDocModel {
+  if (cursor.partPath.length === 0) {
+    return smartDoc;
+  }
 
-  perspective: Perspective;
-  query: QueryModel;
-  config: ViewConfigModel;
-
+  const part = findSmartDocPartByPath(smartDoc, cursor.partPath);
+  return (part as SmartDocEmbeddedPart).smartDoc;
 }
 
-export interface ViewConfigModel {
+export function findSmartDocPartByPath(smartDoc: SmartDocModel, partPath: number[]): SmartDocPart {
+  if (!partPath || partPath.length === 0) {
+    throw Error('Invalid smart document part path');
+  }
 
-  postit?: PostItConfigModel;
-  search?: SearchConfigModel;
-  table?: TableConfig;
-  smartdoc?: SmartDocConfig;
+  const part = smartDoc.parts[partPath[0]];
+  if (partPath.length === 1) {
+    return part;
+  }
 
-}
-
-export interface PostItConfigModel {
-
-  documentIdsOrder?: string[];
-
-}
-
-export interface SearchConfigModel {
-
-  expandedDocumentIds?: string[];
-  searchTab?: string; // TODO maybe create enum
-
+  return findSmartDocPartByPath(part.smartDoc, partPath.slice(1));
 }

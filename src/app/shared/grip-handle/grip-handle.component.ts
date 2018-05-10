@@ -17,38 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Perspective} from '../../../view/perspectives/perspective';
-import {ResourceModel} from '../../model/resource.model';
-import {QueryModel} from '../navigation/query.model';
-import {SmartDocConfig} from '../smartdoc/smartdoc.model';
-import {TableConfig} from '../tables/table.model';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 
-export interface ViewModel extends ResourceModel {
+@Component({
+  selector: 'grip-handle',
+  templateUrl: './grip-handle.component.html',
+  styleUrls: ['./grip-handle.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class GripHandleComponent implements OnInit {
 
-  perspective: Perspective;
-  query: QueryModel;
-  config: ViewConfigModel;
+  @Input()
+  public columns: number = 2;
 
-}
+  @Input()
+  public rows: number = 3;
 
-export interface ViewConfigModel {
+  constructor() { }
 
-  postit?: PostItConfigModel;
-  search?: SearchConfigModel;
-  table?: TableConfig;
-  smartdoc?: SmartDocConfig;
-
-}
-
-export interface PostItConfigModel {
-
-  documentIdsOrder?: string[];
-
-}
-
-export interface SearchConfigModel {
-
-  expandedDocumentIds?: string[];
-  searchTab?: string; // TODO maybe create enum
+  ngOnInit() {
+  }
 
 }

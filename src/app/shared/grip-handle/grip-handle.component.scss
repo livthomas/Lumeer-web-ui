@@ -1,0 +1,38 @@
+div {
+  border:dashed 1px #aaaaaa;
+  padding: 6px 12px;
+  font-size: 1.2em;
+}
+
+span.grippy {
+  content: '....';
+  width: 10px;
+  height: 20px;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 5px;
+  padding: 3px 4px;
+  cursor: move;
+  vertical-align: middle;
+  margin-top: -.7em;
+  margin-right: .3em;
+  font-size: 12px;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  color: #cccccc;
+  text-shadow: 1px 0 1px black;
+
+  &::after {
+    content: '.. .. .. ..';
+  }
+}
+
+
+.fa-drag-handle:before {
+  content: "\f142 \f142";
+  letter-spacing: 0.1em;
+}
+
+.fa-th {
+  clip-path: polygon(100% 0%, 70% 0%, 70% 30%, 30% 30%, 30% 60%, 0% 60%, 0% 100%, 100% 100%);
+}

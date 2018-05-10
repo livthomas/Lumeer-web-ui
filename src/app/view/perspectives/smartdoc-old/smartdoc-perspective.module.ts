@@ -63,9 +63,6 @@ import {SmartDocTextComponent} from './text/smartdoc-text.component';
     SmartDocPerspectiveComponent,
     SmartDocEmbeddedComponent,
     SmartDocTextComponent
-  ],
-  exports: [
-    SmartDocPerspectiveComponent
   ]
 })
 export class SmartDocPerspectiveModule {

@@ -23,6 +23,8 @@ import {createSelector} from '@ngrx/store';
 import {AppState} from '../app.state';
 import {CollectionModel} from '../collections/collection.model';
 import {selectCollectionsDictionary} from '../collections/collections.state';
+import {getOtherLinkedDocumentId} from '../link-instances/link-instance.model';
+import {selectLinkInstancesByTypeAndDocument} from '../link-instances/link-instances.state';
 import {selectQuery} from '../navigation/navigation.state';
 import {QueryModel} from '../navigation/query.model';
 
@@ -62,3 +64,12 @@ function filterDocuments(documents: DocumentModel[], collections: Dictionary<Col
       return {...document, collection: collections[document.collectionId]};
     });
 }
+
+export const selectDocumentsByLink = (linkTypeId: string, linkedDocumentId: string) => createSelector(
+  selectDocumentsDictionary,
+  selectLinkInstancesByTypeAndDocument(linkTypeId, linkedDocumentId),
+  (documentsMap, linkInstances) => linkInstances
+    .map(linkInstance => getOtherLinkedDocumentId(linkInstance, linkedDocumentId))
+    .map(documentId => documentsMap[documentId])
+    .filter(document => document)
+);

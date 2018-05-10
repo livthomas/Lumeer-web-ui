@@ -21,7 +21,7 @@ import {Action} from '@ngrx/store';
 import {QueryModel} from '../navigation/query.model';
 import {SmartDocModel} from '../smartdoc/smartdoc.model';
 import {TableConfig} from '../tables/table.model';
-import {PostItConfigModel, SearchConfigModel, TableConfigModel, ViewConfigModel, ViewModel} from './view.model';
+import {PostItConfigModel, SearchConfigModel, ViewConfigModel, ViewModel} from './view.model';
 
 export enum ViewsActionType {
 
@@ -43,7 +43,6 @@ export enum ViewsActionType {
   CHANGE_SEARCH_CONFIG = '[Views] Change Search Config',
   CHANGE_SMARTDOC_CONFIG = '[Views] Change Smart Document Config',
   CHANGE_TABLE_CONFIG = '[Views] Change Table Config',
-  CHANGE_TABLE2_CONFIG = '[Views] Change Table 2 Config',
 
   CLEAR = '[Views] Clear'
 
@@ -152,13 +151,6 @@ export namespace ViewsAction {
   export class ChangeTableConfig implements Action {
     public readonly type = ViewsActionType.CHANGE_TABLE_CONFIG;
 
-    public constructor(public payload: { config: TableConfigModel }) {
-    }
-  }
-
-  export class ChangeTable2Config implements Action {
-    public readonly type = ViewsActionType.CHANGE_TABLE2_CONFIG;
-
     public constructor(public payload: { config: TableConfig }) {
     }
   }
@@ -173,7 +165,7 @@ export namespace ViewsAction {
   export type All = GetByCode | GetSuccess | GetFailure |
     Create | CreateSuccess | CreateFailure |
     Update | UpdateSuccess | UpdateFailure |
-    ChangeConfig | ChangePostItConfig | ChangeSearchConfig | ChangeSmartDocConfig | ChangeTableConfig | ChangeTable2Config |
+    ChangeConfig | ChangePostItConfig | ChangeSearchConfig | ChangeSmartDocConfig | ChangeTableConfig |
     Clear;
 
 }

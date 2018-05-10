@@ -1,0 +1,12 @@
+<div *ngFor="let part of parts; index as partIndex">
+  <smartdoc-embedded *ngIf="isEmbeddedPart(part)"
+                     [cursor]="createPartCursor(partIndex)"
+                     [document]="document"
+                     [part]="part">
+  </smartdoc-embedded>
+  <smartdoc-text *ngIf="isTextPart(part)"
+                 [cursor]="createPartCursor(partIndex)"
+                 [document]="document"
+                 [part]="part">
+  </smartdoc-text>
+</div>

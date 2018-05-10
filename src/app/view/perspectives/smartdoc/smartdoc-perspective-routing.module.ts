@@ -17,38 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Perspective} from '../../../view/perspectives/perspective';
-import {ResourceModel} from '../../model/resource.model';
-import {QueryModel} from '../navigation/query.model';
-import {SmartDocConfig} from '../smartdoc/smartdoc.model';
-import {TableConfig} from '../tables/table.model';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {SmartdocPerspectiveComponent} from './smartdoc-perspective.component';
 
-export interface ViewModel extends ResourceModel {
+const smartDocRoutes: Routes = [
+  {
+    path: '',
+    component: SmartdocPerspectiveComponent
+  }
+];
 
-  perspective: Perspective;
-  query: QueryModel;
-  config: ViewConfigModel;
-
-}
-
-export interface ViewConfigModel {
-
-  postit?: PostItConfigModel;
-  search?: SearchConfigModel;
-  table?: TableConfig;
-  smartdoc?: SmartDocConfig;
-
-}
-
-export interface PostItConfigModel {
-
-  documentIdsOrder?: string[];
-
-}
-
-export interface SearchConfigModel {
-
-  expandedDocumentIds?: string[];
-  searchTab?: string; // TODO maybe create enum
+@NgModule({
+  imports: [
+    RouterModule.forChild(smartDocRoutes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+export class SmartdocPerspectiveRoutingModule {
 
 }
