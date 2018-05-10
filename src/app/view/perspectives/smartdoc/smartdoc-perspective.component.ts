@@ -4,7 +4,9 @@ import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../../core/store/app.state';
 import {selectQuery} from '../../../core/store/navigation/navigation.state';
 import {QueryModel} from '../../../core/store/navigation/query.model';
-import {SmartDocCursor} from '../../../core/store/smartdoc/smartdoc.model';
+import {SmartDocAction} from '../../../core/store/smartdoc/smartdoc.action';
+import {SmartDocCursor, SmartDocModel} from '../../../core/store/smartdoc/smartdoc.model';
+import {selectSmartDoc} from '../../../core/store/smartdoc/smartdoc.state';
 
 @Component({
   selector: 'smartdoc-perspective',
@@ -21,22 +23,43 @@ export class SmartdocPerspectiveComponent implements OnInit, OnDestroy {
     partPath: []
   };
 
+  public smartDoc: SmartDocModel;
+
   public constructor(private store: Store<AppState>) {
   }
 
   public ngOnInit() {
-    // TODO create smartdoc state based on config / query (linked collections)
-    this.subscriptions.add(
-      this.store.select(selectQuery).subscribe(query => this.query = query)
-    );
+    this.subscriptions.add(this.subscribeToSmartDoc());
+    this.subscriptions.add(this.subscribeToQuery());
+  }
+
+  private subscribeToSmartDoc(): Subscription {
+    return this.store.select(selectSmartDoc).subscribe(smartDoc => {
+      if (smartDoc) {
+        this.smartDoc = smartDoc;
+      } else {
+        this.store.dispatch(new SmartDocAction.Create());
+      }
+    });
+  }
+
+  private subscribeToQuery(): Subscription {
+    return this.store.select(selectQuery).subscribe(query => this.query = query);
   }
 
   public ngOnDestroy() {
     this.subscriptions.unsubscribe();
+
+    // TODO save to view config in the same action
+    this.store.dispatch(new SmartDocAction.Clear());
   }
 
   public isDisplayable(): boolean {
     return this.query && this.query.collectionIds && this.query.collectionIds.length === 1;
+  }
+
+  public isLoaded(): boolean {
+    return !!this.smartDoc;
   }
 
 }

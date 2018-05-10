@@ -4,7 +4,7 @@
      i18n="@@smartdoc.query.invalid">Your query results cannot be shown using smart document perspective. The query needs to specify exactly one file.
 </div>
 
-<div *ngIf="isDisplayable()">
+<div *ngIf="isDisplayable() && isLoaded()">
   <div class="container-fluid">
     <div class="row">
       <div class="col"></div>

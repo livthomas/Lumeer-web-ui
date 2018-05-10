@@ -22,3 +22,7 @@ import {LinkTypeModel} from '../../core/store/link-types/link-type.model';
 export function getOtherLinkedCollectionId(linkType: LinkTypeModel, collectionId: string): string {
   return linkType.collectionIds[0] === collectionId ? linkType.collectionIds[1] : linkType.collectionIds[0];
 }
+
+export function filterLinkTypesByCollection(linkTypes: LinkTypeModel[], collectionId: string): LinkTypeModel[] {
+  return linkTypes.filter(linkType => linkType.collectionIds.includes(collectionId));
+}

@@ -18,20 +18,36 @@
  */
 
 import {Action} from '@ngrx/store';
-import {SmartDocCursor, SmartDocPart} from './smartdoc.model';
+import {SmartDocCursor, SmartDocModel, SmartDocPart} from './smartdoc.model';
 
 export enum SmartDocActionType {
+
+  CREATE = '[Smart Document] Create',
+  CREATE_SUCCESS = '[Smart Document] Create :: Success',
 
   ADD_PART = '[Smart Document] Add Part',
   REPLACE_PART = '[Smart Document] Replace Part',
   MOVE_PART = '[Smart Document] Move Part',
   REMOVE_PART = '[Smart Document] Remove Part',
 
-  SET_CURSOR = '[SmartDoc Document] Set Cursor'
+  SET_CURSOR = '[SmartDoc Document] Set Cursor',
+
+  CLEAR = '[Smart Document] Clear'
 
 }
 
 export namespace SmartDocAction {
+
+  export class Create implements Action {
+    public readonly type = SmartDocActionType.CREATE;
+  }
+
+  export class CreateSuccess implements Action {
+    public readonly type = SmartDocActionType.CREATE_SUCCESS;
+
+    public constructor(public payload: { smartDoc: SmartDocModel }) {
+    }
+  }
 
   export class AddPart implements Action {
     public readonly type = SmartDocActionType.ADD_PART;
@@ -68,5 +84,12 @@ export namespace SmartDocAction {
     }
   }
 
-  export type All = AddPart | ReplacePart | MovePart | SetCursor;
+  export class Clear implements Action {
+    public readonly type = SmartDocActionType.CLEAR;
+  }
+
+  export type All = Create | CreateSuccess |
+    AddPart | ReplacePart | MovePart |
+    SetCursor |
+    Clear;
 }

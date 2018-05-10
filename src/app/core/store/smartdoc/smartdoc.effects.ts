@@ -24,14 +24,34 @@ import {I18n} from '@ngx-translate/i18n-polyfill';
 import {Observable} from 'rxjs/Observable';
 import {map, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {AppState} from '../app.state';
+import {selectCollectionsDictionary} from '../collections/collections.state';
+import {selectLinkTypesDictionary} from '../link-types/link-types.state';
+import {selectQuery} from '../navigation/navigation.state';
 import {NotificationsAction} from '../notifications/notifications.action';
+import {selectViewSmartDocConfig} from '../views/views.state';
 import {SmartDocAction, SmartDocActionType} from './smartdoc.action';
 import {SmartDocEmbeddedPart} from './smartdoc.model';
 import {selectSmartDoc, selectSmartDocPartByPath} from './smartdoc.state';
-import {findSmartDocPartByPath} from './smartdoc.utils';
+import {createSmartDocFromConfig, createSmartDocFromQuery, findSmartDocPartByPath, smartDocConfigFollowsQuery} from './smartdoc.utils';
 
 @Injectable()
 export class SmartDocEffects {
+
+  @Effect()
+  public create$: Observable<Action> = this.actions$.pipe(
+    ofType<SmartDocAction.Create>(SmartDocActionType.CREATE),
+    mergeMap(() => Observable.combineLatest(
+      this.store$.select(selectQuery),
+      this.store$.select(selectViewSmartDocConfig),
+      this.store$.select(selectCollectionsDictionary),
+      this.store$.select(selectLinkTypesDictionary)
+    )),
+    map(([query, config, collectionsMap, linkTypesMap]) => {
+      const smartDoc = smartDocConfigFollowsQuery(config, query, linkTypesMap) ?
+        createSmartDocFromConfig(config) : createSmartDocFromQuery(query, collectionsMap, linkTypesMap);
+      return new SmartDocAction.CreateSuccess({smartDoc});
+    })
+  );
 
   @Effect()
   public addPart$: Observable<Action> = this.actions$.pipe(

@@ -24,10 +24,14 @@ import {initialSmartDocState, SmartDocState} from './smartdoc.state';
 export function smartDocReducer(state: SmartDocState = initialSmartDocState,
                                 action: SmartDocAction.All): SmartDocState {
   switch (action.type) {
+    case SmartDocActionType.CREATE_SUCCESS:
+      return {...state, smartDoc: action.payload.smartDoc};
     case SmartDocActionType.REPLACE_PART:
       return replacePart(state, action);
     case SmartDocActionType.SET_CURSOR:
       return {...state, cursor: action.payload.cursor};
+    case SmartDocActionType.CLEAR:
+      return initialSmartDocState;
     default:
       return state;
   }
