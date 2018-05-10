@@ -31,8 +31,7 @@ import {LinkTypesAction} from '../../../core/store/link-types/link-types.action'
 import {NavigationAction} from '../../../core/store/navigation/navigation.action';
 import {selectLinkCollectionIds, selectPerspective} from '../../../core/store/navigation/navigation.state';
 import {SmartDocAction} from '../../../core/store/smartdoc/smartdoc.action';
-import {SmartDocPartModel, SmartDocPartType} from '../../../core/store/smartdoc/smartdoc.model';
-import {SelectedSmartDocPart, selectSelectedSmartDocPart} from '../../../core/store/smartdoc/smartdoc.state';
+import {SmartDocPartType} from '../../../core/store/smartdoc/smartdoc.model';
 import {DEFAULT_TABLE_ID} from '../../../core/store/tables/table.model';
 import {TablesAction} from '../../../core/store/tables/tables.action';
 import {Perspective} from '../../../view/perspectives/perspective';
@@ -50,7 +49,7 @@ export class NewLinkDialogComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private collections: CollectionModel[];
 
-  private selectedSmartDocPart: SelectedSmartDocPart;
+  // private selectedSmartDocPart: SelectedSmartDocPart;
 
   private perspective: Perspective;
 
@@ -89,7 +88,7 @@ export class NewLinkDialogComponent implements OnInit, OnDestroy, AfterViewInit 
     this.form.reset();
 
     this.subscribeToPerspective();
-    this.subscribeToSelectedSmartDocPart();
+    // this.subscribeToSelectedSmartDocPart();
     this.subscribeToLinkCollectionIds();
   }
 
@@ -99,14 +98,14 @@ export class NewLinkDialogComponent implements OnInit, OnDestroy, AfterViewInit 
     );
   }
 
-  private subscribeToSelectedSmartDocPart() {
-    this.subscriptions.add(
-      this.store.select(selectSelectedSmartDocPart).pipe(
-        withLatestFrom(this.store.select(selectPerspective)),
-        filter(([selectedPart, perspective]) => !!selectedPart && perspective === Perspective.SmartDoc)
-      ).subscribe(([selectedPart]) => this.selectedSmartDocPart = selectedPart)
-    );
-  }
+  // private subscribeToSelectedSmartDocPart() {
+  //   this.subscriptions.add(
+  //     this.store.select(selectSelectedSmartDocPart).pipe(
+  //       withLatestFrom(this.store.select(selectPerspective)),
+  //       filter(([selectedPart, perspective]) => !!selectedPart && perspective === Perspective.SmartDoc)
+  //     ).subscribe(([selectedPart]) => this.selectedSmartDocPart = selectedPart)
+  //   );
+  // }
 
   private subscribeToLinkCollectionIds() {
     this.subscriptions.add(
@@ -171,26 +170,26 @@ export class NewLinkDialogComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   private createNextAction(): Action {
-    if (this.perspective === Perspective.SmartDoc && this.selectedSmartDocPart) {
-      return this.createAddSmartDocPartAction();
-    }
+    // if (this.perspective === Perspective.SmartDoc && this.selectedSmartDocPart) {
+    //   return this.createAddSmartDocPartAction();
+    // }
     if (this.perspective === Perspective.Table) {
       return new NavigationAction.AddLinkToQuery({linkTypeId: null});
     }
     return null;
   }
 
-  private createAddSmartDocPartAction(): SmartDocAction.AddPart {
-    const part: SmartDocPartModel = {
-      type: SmartDocPartType.Embedded,
-      perspective: Perspective.Table
-    };
-    return new SmartDocAction.AddPart({
-      partPath: this.selectedSmartDocPart.path,
-      partIndex: this.selectedSmartDocPart.partIndex + 1,
-      part
-    });
-  }
+  // private createAddSmartDocPartAction(): SmartDocAction.AddPart {
+  //   const part: SmartDocPartModel = {
+  //     type: SmartDocPartType.Embedded,
+  //     perspective: Perspective.Table
+  //   };
+  //   return new SmartDocAction.AddPart({
+  //     partPath: this.selectedSmartDocPart.path,
+  //     partIndex: this.selectedSmartDocPart.partIndex + 1,
+  //     part
+  //   });
+  // }
 
   private createTablePartAction(): TablesAction.CreatePart {
     return new TablesAction.CreatePart({

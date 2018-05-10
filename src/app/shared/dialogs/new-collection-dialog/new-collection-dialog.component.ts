@@ -21,7 +21,6 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {Store} from '@ngrx/store';
-import {filter} from 'rxjs/operators';
 import {Subscription} from 'rxjs/Subscription';
 import {DEFAULT_COLOR, DEFAULT_ICON} from '../../../core/constants';
 import {AppState} from '../../../core/store/app.state';
@@ -29,11 +28,7 @@ import {CollectionModel} from '../../../core/store/collections/collection.model'
 import {CollectionsAction} from '../../../core/store/collections/collections.action';
 import {LinkTypeModel} from '../../../core/store/link-types/link-type.model';
 import {LinkTypesAction} from '../../../core/store/link-types/link-types.action';
-import {SmartDocAction} from '../../../core/store/smartdoc/smartdoc.action';
-import {SmartDocPartModel, SmartDocPartType} from '../../../core/store/smartdoc/smartdoc.model';
-import {SelectedSmartDocPart, selectSelectedSmartDocPart} from '../../../core/store/smartdoc/smartdoc.state';
 import {CollectionValidators} from '../../../core/validators/collection.validators';
-import {Perspective} from '../../../view/perspectives/perspective';
 
 declare let $: any;
 
@@ -49,7 +44,7 @@ export class NewCollectionDialogComponent implements OnInit, OnDestroy {
   @Input()
   public linkedCollection: CollectionModel;
 
-  private selectedSmartDocPart: SelectedSmartDocPart;
+  // private selectedSmartDocPart: SelectedSmartDocPart;
   private smartDocSubscription: Subscription;
 
   public form: FormGroup;
@@ -101,7 +96,7 @@ export class NewCollectionDialogComponent implements OnInit, OnDestroy {
     this.reset();
 
     if (this.linkedCollection) {
-      this.subscribeToSelectedSmartDocPart();
+      // this.subscribeToSelectedSmartDocPart();
     }
 
     if (!this.id) {
@@ -109,14 +104,14 @@ export class NewCollectionDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribeToSelectedSmartDocPart() {
-    this.smartDocSubscription = this.store.select(selectSelectedSmartDocPart).pipe(
-      filter(selectedPart => !!selectedPart)
-    ).subscribe(selectedPart => {
-      this.selectedSmartDocPart = selectedPart;
-      this.reset();
-    });
-  }
+  // private subscribeToSelectedSmartDocPart() {
+  //   this.smartDocSubscription = this.store.select(selectSelectedSmartDocPart).pipe(
+  //     filter(selectedPart => !!selectedPart)
+  //   ).subscribe(selectedPart => {
+  //     this.selectedSmartDocPart = selectedPart;
+  //     this.reset();
+  //   });
+  // }
 
   public ngOnDestroy() {
     if (this.smartDocSubscription) {
@@ -166,21 +161,21 @@ export class NewCollectionDialogComponent implements OnInit, OnDestroy {
       name: this.linkNameInput.value,
       collectionIds: [this.linkedCollection.id, null]
     };
-    const nextAction = this.selectedSmartDocPart ? this.createAddSmartDocPartAction() : null;
-    return new LinkTypesAction.Create({linkType, nextAction});
+    // const nextAction = this.selectedSmartDocPart ? this.createAddSmartDocPartAction() : null;
+    return new LinkTypesAction.Create({linkType}); // nextAction
   }
 
-  private createAddSmartDocPartAction() {
-    const part: SmartDocPartModel = {
-      type: SmartDocPartType.Embedded,
-      perspective: Perspective.Table
-    };
-    return new SmartDocAction.AddPart({
-      partPath: this.selectedSmartDocPart.path,
-      partIndex: this.selectedSmartDocPart.partIndex + 1,
-      part
-    });
-  }
+  // private createAddSmartDocPartAction() {
+  //   const part: SmartDocPartModel = {
+  //     type: SmartDocPartType.Embedded,
+  //     perspective: Perspective.Table
+  //   };
+  //   return new SmartDocAction.AddPart({
+  //     partPath: this.selectedSmartDocPart.path,
+  //     partIndex: this.selectedSmartDocPart.partIndex + 1,
+  //     part
+  //   });
+  // }
 
   public onCollectionNameChange() {
     if (this.linkedCollection && !this.linkNameInput.dirty) {

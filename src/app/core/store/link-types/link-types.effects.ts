@@ -30,6 +30,7 @@ import {NavigationAction} from '../navigation/navigation.action';
 import {QueryConverter} from '../navigation/query.converter';
 import {NotificationsAction} from '../notifications/notifications.action';
 import {SmartDocAction} from '../smartdoc/smartdoc.action';
+import {SmartDocEmbeddedPart} from '../smartdoc/smartdoc.model';
 import {LinkTypeConverter} from './link-type.converter';
 import {LinkTypesAction, LinkTypesActionType} from './link-types.action';
 
@@ -79,7 +80,7 @@ export class LinkTypesEffects {
           const actions: Action[] = [new LinkTypesAction.CreateSuccess({linkType: linkType})];
 
           if (nextAction && nextAction instanceof SmartDocAction.AddPart) {
-            nextAction.payload.part.linkTypeId = linkType.id;
+            (nextAction.payload.part as SmartDocEmbeddedPart).linkTypeId = linkType.id;
             actions.push(nextAction);
           }
           if (nextAction && nextAction instanceof NavigationAction.AddLinkToQuery) {
