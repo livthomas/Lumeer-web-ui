@@ -136,7 +136,7 @@ export function createSmartDocFromQuery(query: QueryModel, collectionsMap: Dicti
 
 function createSmartDocFromCollectionTree(tree: CollectionNode, collectionsMap: Dictionary<CollectionModel>): SmartDocModel {
   const collection = collectionsMap[tree.collectionId];
-  const textPart: SmartDocPart = new SmartDocTextPart(''); // TODO generate attributes text table
+  const textPart: SmartDocPart = new SmartDocTextPart('Attributes text table should be here'); // TODO generate attributes text table
 
   return {
     collectionId: collection.id,

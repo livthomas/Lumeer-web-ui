@@ -1,7 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Store} from '@ngrx/store';
+import {tap} from 'rxjs/operators';
 import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../../core/store/app.state';
+import {DocumentsAction} from '../../../core/store/documents/documents.action';
 import {selectQuery} from '../../../core/store/navigation/navigation.state';
 import {QueryModel} from '../../../core/store/navigation/query.model';
 import {SmartDocAction} from '../../../core/store/smartdoc/smartdoc.action';
@@ -44,7 +46,14 @@ export class SmartdocPerspectiveComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToQuery(): Subscription {
-    return this.store.select(selectQuery).subscribe(query => this.query = query);
+    return this.store.select(selectQuery).pipe(
+      tap(query => {
+        if (query && !this.query) {
+          // TODO load linked documents as well as other entitites
+          this.store.dispatch(new DocumentsAction.Get({query}));
+        }
+      })
+    ).subscribe(query => this.query = query);
   }
 
   public ngOnDestroy() {

@@ -1,4 +1,4 @@
-<div *ngFor="let part of parts; index as partIndex">
+<div *ngFor="let part of parts$ | async; index as partIndex">
   <smartdoc-embedded *ngIf="isEmbeddedPart(part)"
                      [cursor]="createPartCursor(partIndex)"
                      [document]="document"
