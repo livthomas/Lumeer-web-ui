@@ -17,15 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvironmentVariables} from './environment-variables';
+import {Component, Type} from '@angular/core';
 
-export interface Environment extends EnvironmentVariables {
-  analytics: boolean;
-  auth: boolean;
-  mapQuestKey: string;
-  production: boolean;
-  storeDevtools: boolean;
-  name?: string;
-  paymentGw: string;
-  featureTable4?: boolean;
+export interface TableLayout {
+  columnWidths: number[];
+  header: TableCell[][];
+  body: TableCell[][]; // scrollable part
+  footer: TableCell[][];
+  width: number;
+  height: number;
+  selectedCells: [TablePosition, TablePosition];
+}
+
+interface TableCell {
+  colspan: number;
+  rowspan: number;
+  class: string; // background, outline…
+  style: string;
+  componentType: Type<Component>;
+  componentData: Record<string, any>;
+}
+
+export interface TablePosition {
+  x: number;
+  y: number;
 }

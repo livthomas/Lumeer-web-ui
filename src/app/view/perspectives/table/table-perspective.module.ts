@@ -58,6 +58,7 @@ import {TableHeaderComponent} from './header/table-header.component';
 import {TableEditableCellDirective} from './shared/directives/table-editable-cell.directive';
 import {TablePipesModule} from './shared/pipes/table-pipes.module';
 import {TablePerspectiveComponent} from './table-perspective.component';
+import {TableRenderComponent} from './render/table-render.component';
 
 @NgModule({
   imports: [
@@ -103,6 +104,7 @@ import {TablePerspectiveComponent} from './table-perspective.component';
     TableHierarchyColumnComponent,
     TableHierarchyCellMenuComponent,
     TableHeaderAddButtonComponent,
+    TableRenderComponent,
   ],
   entryComponents: [TablePerspectiveComponent],
   exports: [TablePerspectiveComponent],

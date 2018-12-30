@@ -17,15 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvironmentVariables} from './environment-variables';
+import {Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
+import {TableLayout} from './table-layout';
+import {TableUserAction} from './table-user-action';
 
-export interface Environment extends EnvironmentVariables {
-  analytics: boolean;
-  auth: boolean;
-  mapQuestKey: string;
-  production: boolean;
-  storeDevtools: boolean;
-  name?: string;
-  paymentGw: string;
-  featureTable4?: boolean;
+@Component({
+  selector: 'table-render',
+  templateUrl: './table-render.component.html',
+  styleUrls: ['./table-render.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class TableRenderComponent {
+  @Input()
+  public layout: TableLayout;
+
+  @Output()
+  public userAction = new EventEmitter<TableUserAction>();
 }

@@ -17,15 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvironmentVariables} from './environment-variables';
+import {TablePosition} from './table-layout';
 
-export interface Environment extends EnvironmentVariables {
-  analytics: boolean;
-  auth: boolean;
-  mapQuestKey: string;
-  production: boolean;
-  storeDevtools: boolean;
-  name?: string;
-  paymentGw: string;
-  featureTable4?: boolean;
+export interface TableUserAction {
+  type: TableUserActionType;
+  position: TablePosition;
+  data?: any;
 }
+
+export enum TableUserActionType {}
